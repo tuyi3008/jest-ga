@@ -48,11 +48,13 @@ This typically indicates that your device does not have a healthy Internet conne
                 .board {
                     display: grid;
                     gap: 10px;
-                    grid-template-columns: repeat(${e}, 1fr);
+                    grid-template-columns: repeat(${e}, minmax(0, 1fr));
+                    justify-content: center;
                 }
                 shape-card {
                     width: 100px;
-                    height: 100px;
+                    aspect-ratio: 1/1; 
+                    max-width: calc((600px - (${e} - 1) * 10px) / ${e});
                     cursor: pointer;
                 }
                 button {
@@ -71,4 +73,4 @@ This typically indicates that your device does not have a healthy Internet conne
 
             <button id="show-average">Show Average Clicks</button>
             <div class="average"></div>
-        `,this.matchedCount=0,this.addCardClickListeners(),this.shadowRoot.querySelector("#restart").addEventListener("click",()=>this.restartGame()),this.shadowRoot.querySelector("#show-average").addEventListener("click",()=>this.showAverageClicks())}addCardClickListeners(){this.shadowRoot.querySelectorAll("shape-card").forEach(e=>{e.addEventListener("click",()=>this.handleCardClick(e))})}handleCardClick(t){if(!this.lockBoard&&!t.isFaceUp()&&(this.clicks++,t.flip(),this.flippedCards.push(t),this.flippedCards.length===2)){const[e,n]=this.flippedCards;e.getAttribute("type")===n.getAttribute("type")&&e.getAttribute("colour")===n.getAttribute("colour")?(this.flippedCards=[],this.matchedCount+=2,this.checkWin()):(this.lockBoard=!0,setTimeout(()=>{e.flip(),n.flip(),this.flippedCards=[],this.lockBoard=!1},1e3))}}async checkWin(){const{rows:t,cols:e}=this.parseSize(),n=t*e,s=da(_a,"gameResults");if(this.matchedCount===n){console.log("Game completed with clicks =",this.clicks);const o=this.shadowRoot.querySelector(".status");o.textContent="🎉 Congratulations! You Win!";try{await Bm(s,{clicks:this.clicks,timestamp:new Date}),console.log(`Game result saved! Clicks: ${this.clicks}`)}catch(a){console.error("Error saving game result: ",a)}}}restartGame(){this.flippedCards=[],this.lockBoard=!1,this.matchedCount=0,this.clicks=0,this.render()}async showAverageClicks(){try{const t=await Um(da(_a,"gameResults"));let e=0,n=0;t.forEach(o=>{const a=o.data();a.clicks!==void 0&&(e+=a.clicks,n++)});const s=n>0?(e/n).toFixed(2):0;this.shadowRoot.querySelector(".average").textContent=`Average Clicks: ${s}`}catch(t){console.error("Error fetching game results:",t)}}}customElements.define("memory-game",zm);
+        `,this.matchedCount=0,this.addCardClickListeners(),this.shadowRoot.querySelector("#restart").addEventListener("click",()=>this.restartGame()),this.shadowRoot.querySelector("#show-average").addEventListener("click",()=>this.showAverageClicks())}addCardClickListeners(){this.shadowRoot.querySelectorAll("shape-card").forEach(e=>{e.addEventListener("click",()=>this.handleCardClick(e))})}handleCardClick(t){if(!this.lockBoard&&!t.isFaceUp()&&(this.clicks++,t.flip(),this.flippedCards.push(t),this.flippedCards.length===2)){const[e,n]=this.flippedCards;e.getAttribute("type")===n.getAttribute("type")&&e.getAttribute("colour")===n.getAttribute("colour")?(this.flippedCards=[],this.matchedCount+=2,this.checkWin()):(this.lockBoard=!0,setTimeout(()=>{e.flip(),n.flip(),this.flippedCards=[],this.lockBoard=!1},1e3))}}async checkWin(){const{rows:t,cols:e}=this.parseSize(),n=t*e,s=da(_a,"gameResults");if(this.matchedCount===n){console.log("Game completed with clicks =",this.clicks);const o=this.shadowRoot.querySelector(".status");o.textContent=`🎉 Congratulations! You completed the game in ${this.clicks} clicks.`;try{await Bm(s,{clicks:this.clicks,timestamp:new Date}),console.log(`Game result saved! Clicks: ${this.clicks}`)}catch(a){console.error("Error saving game result: ",a)}}}restartGame(){this.flippedCards=[],this.lockBoard=!1,this.matchedCount=0,this.clicks=0,this.render()}async showAverageClicks(){try{const t=await Um(da(_a,"gameResults"));let e=0,n=0;t.forEach(o=>{const a=o.data();a.clicks!==void 0&&(e+=a.clicks,n++)});const s=n>0?(e/n).toFixed(2):0;this.shadowRoot.querySelector(".average").textContent=`Average Clicks: ${s}`}catch(t){console.error("Error fetching game results:",t)}}}customElements.define("memory-game",zm);
